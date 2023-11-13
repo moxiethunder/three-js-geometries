@@ -1,0 +1,7 @@
+canvas {
+  cursor: grab;
+
+  &[data-grabbing] {
+    cursor: grabbing;
+  }
+}
