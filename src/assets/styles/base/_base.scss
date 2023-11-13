@@ -5,3 +5,71 @@ canvas {
     cursor: grabbing;
   }
 }
+
+#animation-controls {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-content: center;
+  align-content: center;
+  gap: toRem(8);
+  transform: translateX(-50%);
+}
+
+button {
+  $px: 16;
+  $py: $px * 0.5;
+
+  color: white;
+  font-family: sans-serif;
+  text-transform: uppercase;
+  font-weight: 500;
+  background-color: #333;
+  border: none;
+  border-radius: toRem(999);
+
+  height: toRem(32);
+
+  padding-inline: toRem($px);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: cadetblue;
+  }
+
+  &[data-btn-zoom] {
+    position: relative;
+    justify-self: center;
+    isolation: isolate;
+    aspect-ratio: 1 / 1;
+
+    &::before {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  &[data-action-zoom="in"] {
+    &::before {
+      content: "+";
+    }
+  }
+
+  &[data-action-zoom="out"] {
+
+    &::before {
+      content: "-";
+    }
+  }
+
+  &[data-action-reset] {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

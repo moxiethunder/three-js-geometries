@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { getAspectRatio, hasProperty } from '@scripts/utils/utils.js'
-import AnimateScene from '@scripts/classes/AnimateScene.js'
+import AnimateCube from '@scripts/classes/AnimateCube.js'
+import AnimateCamera from '@scripts/classes/AnimateCamera.js'
 
 class ThreeJsScene {
   constructor(config = {}) {
@@ -17,6 +18,18 @@ class ThreeJsScene {
           x: 0,
           y: 0,
         },
+      },
+      orthoCamera = {
+        aspect: {
+          width: 800,
+          height: 600
+        },
+        left: -1,
+        right: 1,
+        top: 1,
+        bottom: -1,
+        near: -3,
+        far: 100,
       },
       camera = {
         fov: 32,
@@ -42,6 +55,7 @@ class ThreeJsScene {
 
     this.background = config.background || background
     this.mesh = config.mesh || mesh
+    this.orthoCamera = config.orthoCamera || orthoCamera
     this.camera = config.camera || camera
     this.renderer = config.renderer || renderer
 
@@ -65,6 +79,14 @@ class ThreeJsScene {
 
     return mesh
   }
+
+  // setOrthoCamera() {
+  //   const { aspect, left, right, top, bottom, near, far } = this.orthoCamera
+  //   const aspectRatio = getAspectRatio(aspect)
+  //   const camera = new THREE.OrthographicCamera(left * aspectRatio, right * aspectRatio, top, bottom, near, far)
+
+  //   return camera
+  // }
 
   setCamera() {
     const { fov, position, aspect } = this.camera
@@ -101,8 +123,10 @@ class ThreeJsScene {
 
   init() {
     this.mesh = this.setMesh()
+    // this.orthoCamera = this.setOrthoCamera()
     this.camera = this.setCamera()
     
+    // this.scene.add(this.mesh, this.orthoCamera)
     this.scene.add(this.mesh, this.camera)
     
     if ( this.pointLight ) {
@@ -121,11 +145,12 @@ class ThreeJsScene {
       canvas: this.canvas,
       scene: this.scene,
       mesh: this.mesh,
+      // camera: this.orthoCamera,
       camera: this.camera,
       renderer: this.renderer,
     }
 
-    this.animateScene = new AnimateScene(assets).init()
+    this.animateScene = new AnimateCube(assets).init()
     return this
   }
 }
