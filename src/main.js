@@ -7,11 +7,11 @@ const sizes = {
 }
 const sceneConfig = {
   canvas: 'threejs-cube',
-  background: 'white',
+  background: 'black',
   mesh: {
     dims: [1, 1, 1],
     properties: {
-      color: 'cyan',
+      color: 'red',
       wireframe: false,
       roughness: 0.5,
       metalness: 0.5,
@@ -38,9 +38,9 @@ const sceneConfig = {
     intensity: 0.5,
   },
   pointLight: {
-    position: [1, 2, 1],
+    position: [1, 1, 1],
     color: 'white',
-    intensity: 10,
+    intensity: 7,
     distance: 500,
     decay: 2,
   }

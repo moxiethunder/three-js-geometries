@@ -1,140 +1,157 @@
 import * as THREE from 'three'
-import gsap from 'gsap'
+import { getAspectRatio, hasProperty } from '@scripts/utils/utils.js'
+import AnimateScene from '@scripts/classes/AnimateScene.js'
 
-class AnimateScene {
-  constructor(config) {
-    this.canvas = config.canvas
-    this.scene = config.scene
-    this.mesh = config.mesh
-    this.camera = config.camera
-    this.renderer = config.renderer
+class ThreeJsScene {
+  constructor(config = {}) {
+    //defaults for config
+    const {
+      background = 'black',
+      mesh = {
+        dims: [2, 2, 2],
+        properties: {
+          color: 'blue',
+          wireframe: false,
+        },
+        rotation: {
+          x: 0,
+          y: 0,
+        },
+      },
+      orthoCamera = {
+        aspect: {
+          width: 800,
+          height: 600
+        },
+        left: -1,
+        right: 1,
+        top: 1,
+        bottom: -1,
+        near: -3,
+        far: 100,
+      },
+      camera = {
+        fov: 32,
+        position: [0, 0, 8],
+        aspect: {
+          width: 800,
+          height: 600
+        },
+      },
+      renderer = {
+        width: 800,
+        height: 600
+      },
+    } = config
 
-    this.vars = {
-      DELAY: 250,
-      VELOCITY: Math.PI * 0.1,
-      isDragging: false,
-      isRotating: true,
-      rotationPosition: { x: 0, y: 0 },
-      previousMousePosition: { x: 0, y: 0 },
-      defaultZoom: this.camera.position.z,
-      clock: new THREE.Clock(),
-    }
-  }
+    //set from config if present, otherwise use defaults
+    this.canvas = document.getElementById(config.canvas)
 
-  animate() {
-    requestAnimationFrame(this.animate.bind(this))
-
-    if (!this.vars.isDragging && this.vars.isRotating) {
-      const elapsedTime = this.vars.clock.getElapsedTime()
-
-      // this.mesh.rotation.x = this.vars.rotationPosition.x + elapsedTime * this.vars.VELOCITY
-      this.mesh.rotation.y = this.vars.rotationPosition.y + elapsedTime * this.vars.VELOCITY
-    }
-
-    this.renderer.render(this.scene, this.camera);
-  }
-
-  onMouseDown(e) {
-    this.vars.isDragging = true
-    this.vars.isRotating = false
-    this.vars.previousMousePosition = { x: e.offsetX, y: e.offsetY }
-    this.vars.rotationPosition = { x: this.mesh.rotation.x, y: this.mesh.rotation.y }
-    this.canvas.setAttribute('data-grabbing', '')
-  }
-
-  onMouseMove(e) {
-    if ( !this.vars.isRotating ) {
-      this.addEventListeners()
-    }
-    if ( this.vars.isDragging ) {
-      let deltaMove = {
-        x: e.offsetX - this.vars.previousMousePosition.x,
-        y: e.offsetY - this.vars.previousMousePosition.y
-      }
-
-      let rotateAngleX = (deltaMove.y / window.innerHeight) * Math.PI * 2
-      let rotateAngleY = (deltaMove.x / window.innerWidth) * Math.PI * 2
-
-      gsap.to(this.mesh.rotation, {
-        x: this.vars.rotationPosition.x + rotateAngleX,
-        y: this.vars.rotationPosition.y + rotateAngleY,
-        duration: 1,
-      })
-    }
-  }
-
-  onMouseUp() {
-    this.vars.isDragging = false
-    this.canvas.removeAttribute('data-grabbing')
-    this.restartAnimation()
-  }
-
-  startAnimation(e, el) {
-    if ( this.vars.isRotating ) return
-    this.addEventListeners()
-    this.canvas.setAttribute('data-playing', true)
-    this.restartAnimation()
-  }
-
-  stopAnimation(e, el) {
-    if ( !this.vars.isRotating ) return
-    this.removeEventListener('mouseup', this.boundOnMouseUp)
-    this.canvas.setAttribute('data-playing', false)
-    this.vars.isRotating = false
-  }
-
-  zoomCamera(e, el) {
-    const targ = e.target
-    const fn = targ.dataset.actionZoom
-    const pos = this.camera.position.z
-    
-    if ( fn === 'in' ) {
-      if ( pos >= 8 ) this.camera.position.z -= 1.25;
-      else if ( pos >= 4 ) this.camera.position.z -= 0.75;
-      else if ( pos > 1 ) this.camera.position.z -= 0.25
-    } else if ( fn === 'out' ) {
-      if ( pos >= 8 ) this.camera.position.z += 1.25
-      else if ( pos >= 4 ) this.camera.position.z += 0.75
-      else if ( pos < 4 ) this.camera.position.z += 0.25
+    if ( !this.canvas ) {
+      console.error(`No canvas found with selector ${config.canvas}`)
+      return
     }
 
-    this.canvas.setAttribute('data-zoom', pos)
+    this.background = config.background || background
+    this.mesh = config.mesh || mesh
+    this.orthoCamera = config.orthoCamera || orthoCamera
+    this.camera = config.camera || camera
+    this.renderer = config.renderer || renderer
+
+    this.ambientLight = hasProperty(config, 'ambientLight')
+      ? config.ambientLight
+      : false
+    this.pointLight = hasProperty(config, 'pointLight')
+      ? config.pointLight
+      : false
+
+    this.scene = new THREE.Scene()
+    this.scene.background = new THREE.Color(this.background)
+  }
+  
+  setMesh() {
+    const { dims, properties, rotation } = this.mesh
+    const geometry = new THREE.BoxGeometry(...dims)
+    const material = new THREE.MeshStandardMaterial(properties)
+    const mesh = new THREE.Mesh(geometry, material)
+    mesh.rotation.set(rotation.x, rotation.y, rotation.z = 0)
+
+    return mesh
   }
 
-  resetCamera(e, el) {
-    this.camera.position.z = this.vars.defaultZoom
-    this.canvas.setAttribute('data-zoom', this.camera.position.z)
+  // setOrthoCamera() {
+  //   const { aspect, left, right, top, bottom, near, far } = this.orthoCamera
+  //   const aspectRatio = getAspectRatio(aspect)
+  //   const camera = new THREE.OrthographicCamera(left * aspectRatio, right * aspectRatio, top, bottom, near, far)
+
+  //   return camera
+  // }
+
+  setCamera() {
+    const { fov, position, aspect } = this.camera
+    const camera = new THREE.PerspectiveCamera(fov, getAspectRatio(aspect))
+    camera.position.set(...position)
+
+    return camera
   }
 
-  restartAnimation() {
-    setTimeout(() => {
-      this.vars.clock = new THREE.Clock()
-      this.vars.rotationPosition = { x: this.mesh.rotation.x, y: this.mesh.rotation.y }
-      this.vars.isRotating = true
-    }, this.vars.DELAY)
+  setAmbientLight() {
+    const { color, intensity } = this.ambientLight
+    const light = new THREE.AmbientLight(color, intensity)
+
+    return light
   }
 
-  bindEventHandlers() {
-    this.boundOnMouseDown = this.onMouseDown.bind(this)
-    this.boundOnMouseMove = this.onMouseMove.bind(this)
-    this.boundOnMouseUp = this.onMouseUp.bind(this)
-  }
-  addEventListeners() {
-    this.canvas.addEventListener('mousedown', this.boundOnMouseDown)
-    this.canvas.addEventListener('mousemove', this.boundOnMouseMove)
-    this.canvas.addEventListener('mouseup', this.boundOnMouseUp)
+  setPointLight() {
+    const { position, color, intensity, distance, decay } = this.pointLight
+    const light = new THREE.PointLight(color, intensity, distance, decay)
+    light.position.set(...position)
+
+    return light
   }
 
-  removeEventListener(type, listener) {
-    this.canvas.removeEventListener(type, listener)
+  setRender() {
+    const { width, height } = this.renderer
+    const renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas
+    })
+    renderer.setSize(width, height)
+
+    return renderer
   }
 
   init() {
-    this.bindEventHandlers()
-    this.addEventListeners()
-    this.animate()
+    this.mesh = this.setMesh()
+    // this.orthoCamera = this.setOrthoCamera()
+    this.camera = this.setCamera()
+    
+    // this.scene.add(this.mesh, this.orthoCamera)
+    this.scene.add(this.mesh, this.camera)
+    
+    if ( this.pointLight ) {
+      const pointLight = this.setPointLight()
+      this.scene.add(pointLight)
+    }
+    
+    if ( this.ambientLight ) {
+      const ambientLight = this.setAmbientLight()
+      this.scene.add(ambientLight)
+    }
+    
+    this.renderer = this.setRender()
+
+    const assets = {
+      canvas: this.canvas,
+      scene: this.scene,
+      mesh: this.mesh,
+      // camera: this.orthoCamera,
+      camera: this.camera,
+      renderer: this.renderer,
+    }
+
+    this.animateScene = new AnimateScene(assets).init()
     return this
   }
 }
 
-export default AnimateScene
+export default ThreeJsScene
