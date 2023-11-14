@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import gsap from 'gsap'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { getPointerPOS } from '@scripts/utils/utils.js'
 
 class AnimateCamera {
   constructor(config) {
@@ -10,128 +12,107 @@ class AnimateCamera {
     this.renderer = config.renderer
 
     this.vars = {
-      DELAY: 250,
-      VELOCITY: Math.PI * 0.1,
       isDragging: false,
-      isRotating: true,
-      rotationPosition: { x: 0, y: 0 },
-      previousMousePosition: { x: 0, y: 0 },
-      defaultZoom: this.camera.position.z,
-      clock: new THREE.Clock(),
+      pointer: {
+        x: 0,
+        y: 0,
+      },
+      sizes: {
+        width: this.canvas.width,
+        height: this.canvas.height,
+      },
+      scroll: {
+        sy: 0.05,
+        dy: 0,
+      }
     }
   }
 
   animate() {
-    requestAnimationFrame(this.animate.bind(this))
-
-    if (!this.vars.isDragging && this.vars.isRotating) {
-      const elapsedTime = this.vars.clock.getElapsedTime()
-
-      // this.mesh.rotation.x = this.vars.rotationPosition.x + elapsedTime * this.vars.VELOCITY
-      this.mesh.rotation.y = this.vars.rotationPosition.y + elapsedTime * this.vars.VELOCITY
+    if ( this.vars.isDragging ) {
+      this.panOnDrag()
     }
+    this.renderer.render(this.scene, this.camera)
+    requestAnimationFrame(() => this.animate())
+  }
+  
+  setCameraCoords(e) {
+    const { x, y } = getPointerPOS(e)
+    const { width, height } = this.vars.sizes
+    
+    this.vars.pointer.x = x / width - 0.5
+    this.vars.pointer.y = -(y / height - 0.5)
+  }
 
-    this.renderer.render(this.scene, this.camera);
+  panOnDrag() {
+    const targetX = Math.sin(this.vars.pointer.x * Math.PI * 2) * 3
+    const targetZ = Math.cos(this.vars.pointer.x * Math.PI * 2) * 3
+    const targetY = this.vars.pointer.y * 5
+    
+    gsap.to(this.camera.position, {
+      x: targetX,
+      z: targetZ,
+      y: targetY,
+      duration: 0.5,
+      ease: 'power2.out',
+      onUpdate: () => {
+        this.camera.lookAt(this.mesh.position)
+      }
+    })
+  }
+
+  zoomOnScroll(e) {
+    const { deltaY } = e
+    const data = this.vars.scroll
+    data.dy = deltaY
+    const camera = this.camera
+
+    const newFov = Math.max(20, Math.min(150, camera.fov + deltaY * data.sy))
+
+    gsap.to(camera, {
+      fov: newFov,
+      duration: 0.5,
+      ease: 'power2.out',
+      onUpdate: () => {
+        camera.updateProjectionMatrix()
+      }
+    })
+  }
+
+  attachEventListeners() {
+    this.canvas.addEventListener('mousemove', e => {
+      this.onMouseMove(e)
+    })
+
+    this.canvas.addEventListener('mousedown', e => {
+      this.onMouseDown(e)
+    })
+
+    this.canvas.addEventListener('mouseup', e => {
+      this.onMouseUp(e)
+    })
+
+    document.addEventListener('wheel', e => {
+      this.zoomOnScroll(e)
+    })
   }
 
   onMouseDown(e) {
     this.vars.isDragging = true
-    this.vars.isRotating = false
-    this.vars.previousMousePosition = { x: e.offsetX, y: e.offsetY }
-    this.vars.rotationPosition = { x: this.mesh.rotation.x, y: this.mesh.rotation.y }
     this.canvas.setAttribute('data-grabbing', '')
   }
 
   onMouseMove(e) {
-    if ( !this.vars.isRotating ) {
-      this.addEventListeners()
-    }
-    if ( this.vars.isDragging ) {
-      let deltaMove = {
-        x: e.offsetX - this.vars.previousMousePosition.x,
-        y: e.offsetY - this.vars.previousMousePosition.y
-      }
-
-      let rotateAngleX = (deltaMove.y / window.innerHeight) * Math.PI * 2
-      let rotateAngleY = (deltaMove.x / window.innerWidth) * Math.PI * 2
-
-      gsap.to(this.mesh.rotation, {
-        x: this.vars.rotationPosition.x + rotateAngleX,
-        y: this.vars.rotationPosition.y + rotateAngleY,
-        duration: 1,
-      })
-    }
+    this.setCameraCoords(e)
   }
 
-  onMouseUp() {
+  onMouseUp(e) {
     this.vars.isDragging = false
     this.canvas.removeAttribute('data-grabbing')
-    this.restartAnimation()
-  }
-
-  startAnimation(e, el) {
-    if ( this.vars.isRotating ) return
-    this.addEventListeners()
-    this.canvas.setAttribute('data-playing', true)
-    this.restartAnimation()
-  }
-
-  stopAnimation(e, el) {
-    if ( !this.vars.isRotating ) return
-    this.removeEventListener('mouseup', this.boundOnMouseUp)
-    this.canvas.setAttribute('data-playing', false)
-    this.vars.isRotating = false
-  }
-
-  zoomCamera(e, el) {
-    const targ = e.target
-    const fn = targ.dataset.actionZoom
-    const pos = this.camera.position.z
-    
-    if ( fn === 'in' ) {
-      if ( pos >= 8 ) this.camera.position.z -= 1.25;
-      else if ( pos >= 4 ) this.camera.position.z -= 0.75;
-      else if ( pos > 1 ) this.camera.position.z -= 0.25
-    } else if ( fn === 'out' ) {
-      if ( pos >= 8 ) this.camera.position.z += 1.25
-      else if ( pos >= 4 ) this.camera.position.z += 0.75
-      else if ( pos < 4 ) this.camera.position.z += 0.25
-    }
-
-    this.canvas.setAttribute('data-zoom', pos)
-  }
-
-  resetCamera(e, el) {
-    this.camera.position.z = this.vars.defaultZoom
-    this.canvas.setAttribute('data-zoom', this.camera.position.z)
-  }
-
-  restartAnimation() {
-    setTimeout(() => {
-      this.vars.clock = new THREE.Clock()
-      this.vars.rotationPosition = { x: this.mesh.rotation.x, y: this.mesh.rotation.y }
-      this.vars.isRotating = true
-    }, this.vars.DELAY)
-  }
-
-  bindEventHandlers() {
-    this.boundOnMouseDown = this.onMouseDown.bind(this)
-    this.boundOnMouseMove = this.onMouseMove.bind(this)
-    this.boundOnMouseUp = this.onMouseUp.bind(this)
-  }
-  addEventListeners() {
-    this.canvas.addEventListener('mousedown', this.boundOnMouseDown)
-    this.canvas.addEventListener('mousemove', this.boundOnMouseMove)
-    this.canvas.addEventListener('mouseup', this.boundOnMouseUp)
-  }
-
-  removeEventListener(type, listener) {
-    this.canvas.removeEventListener(type, listener)
   }
 
   init() {
-    this.bindEventHandlers()
-    this.addEventListeners()
+    this.attachEventListeners()
     this.animate()
     return this
   }

@@ -27,7 +27,7 @@ class AnimateCube {
     if (!this.vars.isDragging && this.vars.isRotating) {
       const elapsedTime = this.vars.clock.getElapsedTime()
 
-      // this.mesh.rotation.x = this.vars.rotationPosition.x + elapsedTime * this.vars.VELOCITY
+      this.mesh.rotation.x = this.vars.rotationPosition.x + elapsedTime * this.vars.VELOCITY
       this.mesh.rotation.y = this.vars.rotationPosition.y + elapsedTime * this.vars.VELOCITY
     }
 
@@ -69,18 +69,16 @@ class AnimateCube {
     this.restartAnimation()
   }
 
-  startAnimation(e, el) {
-    if ( this.vars.isRotating ) return
-    this.addEventListeners()
-    this.canvas.setAttribute('data-playing', true)
-    this.restartAnimation()
-  }
-
-  stopAnimation(e, el) {
-    if ( !this.vars.isRotating ) return
-    this.removeEventListener('mouseup', this.boundOnMouseUp)
-    this.canvas.setAttribute('data-playing', false)
-    this.vars.isRotating = false
+  toggleAnimation(e, el) {
+    if ( !this.vars.isRotating ) {
+      this.addEventListeners()
+      this.canvas.setAttribute('data-playing', true)
+      this.restartAnimation()
+    } else {
+      this.removeEventListener('mouseup', this.boundOnMouseUp)
+      this.canvas.setAttribute('data-playing', false)
+      this.vars.isRotating = false
+    }
   }
 
   zoomCamera(e, el) {
@@ -119,6 +117,7 @@ class AnimateCube {
     this.boundOnMouseMove = this.onMouseMove.bind(this)
     this.boundOnMouseUp = this.onMouseUp.bind(this)
   }
+
   addEventListeners() {
     this.canvas.addEventListener('mousedown', this.boundOnMouseDown)
     this.canvas.addEventListener('mousemove', this.boundOnMouseMove)

@@ -71,7 +71,7 @@ class ThreeJsScene {
   }
   
   setMesh() {
-    const { dims, properties, rotation } = this.mesh
+    const { multicolor, dims, properties, rotation } = this.mesh
     const geometry = new THREE.BoxGeometry(...dims)
     const material = new THREE.MeshStandardMaterial(properties)
     const mesh = new THREE.Mesh(geometry, material)
@@ -122,6 +122,7 @@ class ThreeJsScene {
   }
 
   init() {
+    this.root = document.documentElement
     this.mesh = this.setMesh()
     // this.orthoCamera = this.setOrthoCamera()
     this.camera = this.setCamera()
@@ -150,7 +151,15 @@ class ThreeJsScene {
       renderer: this.renderer,
     }
 
+    // this.renderer.render(this.scene, this.camera)
+    // this.root.setAttribute('data-no-controls', '')
+
     this.animateScene = new AnimateCube(assets).init()
+    this.root.setAttribute('data-mesh-controls', '')
+
+    // this.animateScene = new AnimateCamera(assets).init()
+    // this.root.setAttribute('data-camera-controls', '')
+
     return this
   }
 }

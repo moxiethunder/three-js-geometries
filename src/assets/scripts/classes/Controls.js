@@ -1,128 +1,120 @@
-import { createDomElement } from '@scripts/utils/utils.js'
+import Modal from '@scripts/classes/Modal.js'
+import { createDomElement, addElementToDOM } from '@scripts/utils/utils.js'
+import * as ICONS from '@scripts/lib/icons.js'
 
 class Controls {
   constructor(config) {
     this.scene = config.scene
-    this.fnPlay = this.scene.animateScene.startAnimation.bind(this.scene.animateScene)
-    this.fnPause = this.scene.animateScene.stopAnimation.bind(this.scene.animateScene)
-    this.fnZoom = this.scene.animateScene.zoomCamera.bind(this.scene.animateScene)
-    this.fnReset = this.scene.animateScene.resetCamera.bind(this.scene.animateScene)
-    this.playButton = config.controls.play
-    this.pauseButton = config.controls.pause
-    this.zoomButtons = config.controls.zoom
-    this.resetButton = config.controls.reset
-
+    this.showControls = config.showControls
     this.cameraZoom = this.scene.camera.position.z
     this.canvas = this.scene.canvas
+
+    this.fnToggleAnimation = this.scene.animateScene.toggleAnimation.bind(this.scene.animateScene)
+    this.fnReset = this.scene.animateScene.resetCamera.bind(this.scene.animateScene)
+    this.fnZoom = this.scene.animateScene.zoomCamera.bind(this.scene.animateScene)
+
+    this.data = {
+      toggleAnimation: {
+        type: 'button',
+        domElement: null,
+        fn: this.fnToggleAnimation,
+        props: {
+          id: 'btn-toggle-animation',
+          type: 'button',
+          'data-control-button': '',
+          'data-tooltip': 'Toggle animation',
+          'data-action-toggle-animation': '',
+          'aria-label': 'Toggle animation'
+        },
+        classes: ['btn', 'btn--toggle-animation'],
+      },
+      reset: {
+        type: 'button',
+        domElement: null,
+        fn: this.fnReset,
+        props: {
+          id: 'btn-reset',
+          type: 'button',
+          'data-control-button': '',
+          'data-tooltip': 'Reset camera',
+          'data-action-reset': '',
+          'aria-label': 'Reset camera'
+        },
+        classes: ['btn', 'btn--reset'],
+      },
+      zoomIn: {
+        type: 'button',
+        domElement: null,
+        fn: this.fnZoom,
+        props: {
+          id: 'btn-zoom--in',
+          type: 'button',
+          'data-control-button': '',
+          'data-tooltip': 'Zoom in',
+          'data-btn-zoom': '',
+          'data-action-zoom': 'in',
+          'aria-label': 'Zoom in'
+        },
+        classes: ['btn', 'btn--zoom-in'],
+      },
+      zoomOut: {
+        type: 'button',
+        domElement: null,
+        fn: this.fnZoom,
+        props: {
+          id: 'btn-zoom-out',
+          type: 'button',
+          'data-control-button': '',
+          'data-tooltip': 'Zoom out',
+          'data-btn-zoom': '',
+          'data-action-zoom': 'out',
+          'aria-label': 'Zoom out'
+        },
+        classes: ['btn', 'btn--zoom-out'],
+      },
+    }
   }
 
-  createControlElement(config, parent) {
-    const control = createDomElement(config.data)
-    control.innerText = config.label || ''
-    control.addEventListener('click', (event) => config.fn(event, control))
-    parent.appendChild(control)
-
-    return control
+  createControlElement(name) {
+    if ( name === 'zoom') {
+      Object.assign(this.data.zoomIn, {icon: 'zoomIn'})
+      Object.assign(this.data.zoomOut, {icon: 'zoomOut'})
+      this.data.zoomIn.domElement = createDomElement(this.data.zoomIn)
+      this.data.zoomOut.domElement = createDomElement(this.data.zoomOut)
+    } else {
+      Object.assign(this.data[name], {icon: name})
+      this.data[name].domElement = createDomElement(this.data[name])
+    }
   }
 
   mount(selector) {
-    let btnPlay, btnPause, btnZoomIn, btnZoomOut
     this.container = document.getElementById(selector)
-
+    
     if (!this.container) {
       console.error(`No container found with selector ${selector}`)
       return
     }
 
+    this.modal = new Modal({
+      container: this.container,
+      icon: ICONS.settings,
+    }).mount()
+
     this.canvas.setAttribute('data-playing', true)
     this.canvas.setAttribute('data-zoom', this.cameraZoom)
 
-    if ( this.playButton ) {
-      btnPlay = this.createControlElement({
-        label: 'Play',
-        fn: this.fnPlay,
-        data: {
-          type: 'button',
-          props: {
-            id: 'btn-play',
-            type: 'button',
-            'data-action-play': '',
-            'aria-label': 'Play animation'
-          },
-          classes: ['btn', 'btn--play'],
-        }
-      }, this.container)
-    }
+    Object.entries(this.showControls).forEach(([key, val]) => {
+      if ( !val ) return
+      this.createControlElement(key)
+    })
 
-    if ( this.pauseButton ) {
-      btnPause = this.createControlElement({
-        label: 'Pause',
-        fn: this.fnPause,
-        data: {
-          type: 'button',
-          props: {
-            id: 'btn-pause',
-            type: 'button',
-            'data-action-pause': '',
-            'aria-label': 'Pause animation'
-          },
-          classes: ['btn', 'btn--pause'],
-        }
-      }, this.container)
-    }
+    Object.values(this.data).forEach(val => {
+      const { domElement, fn } = val
+      if ( !domElement || !fn ) return
 
-    if ( this.resetButton ) {
-      this.createControlElement({
-        label: 'Reset',
-        fn: this.fnReset,
-        data: {
-          type: 'button',
-          props: {
-            id: 'btn-reset',
-            type: 'button',
-            'data-action-reset': '',
-            'aria-label': 'Reset camera'
-          },
-          classes: ['btn', 'btn--reset'],
-        }
-      }, this.container)
-    }
-
-    if ( this.zoomButtons ) {
-      btnZoomIn = this.createControlElement({
-        fn: this.fnZoom,
-        data: {
-          type: 'button',
-          props: {
-            id: 'btn-zoom--in',
-            type: 'button',
-            'data-btn-zoom': '',
-            'data-action-zoom': 'in',
-            'aria-label': 'Zoom in'
-          },
-          classes: ['btn', 'btn--zoom-in'],
-        }
-      }, this.container)
-
-      btnZoomOut = this.createControlElement({
-        fn: this.fnZoom,
-        data: {
-          type: 'button',
-          props: {
-            id: 'btn-zoom-out',
-            type: 'button',
-            'data-btn-zoom': '',
-            'data-action-zoom': 'out',
-            'aria-label': 'Zoom out'
-          },
-          classes: ['btn', 'btn--zoom-out'],
-        }
-      }, this.container)
-
-      if ( this.playButton && btnPlay !== null ) {
-        btnPlay.before(btnZoomOut)
-      }
-    }
+      domElement.addEventListener('click', fn)
+      this.modal.appendChild(domElement)
+    })
   }
 }
 

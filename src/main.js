@@ -1,30 +1,34 @@
 import '@styles/main.scss'
 import ThreeJsScene from '@scripts/classes/ThreeJsScene.js'
 import Controls from '@scripts/classes/Controls.js'
+import Modal from '@scripts/classes/Modal.js'
 
 const sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight
+  // width: window.innerWidth,
+  // height: window.innerHeight
+  width: document.documentElement.clientWidth,
+  height: document.documentElement.clientHeight,
 }
+
 const sceneConfig = {
   canvas: 'threejs-cube',
-  background: 'white',
+  background: 'black',
   mesh: {
     dims: [1, 1, 1],
     properties: {
-      color: 'cyan',
+      color: 'red',
       wireframe: false,
       roughness: 0.5,
       metalness: 0.5,
     },
     rotation: {
-      x: Math.PI * 0.175,
-      y: Math.PI * 0.25,
+      x: Math.PI * 0,
+      y: Math.PI * 0,
     }
   },
   camera: {
     fov: 75,
-    position: [0, 0, 3],
+    position: [0, 0, 4],
     aspect: {
       width: sizes.width,
       height: sizes.height,
@@ -41,8 +45,8 @@ const sceneConfig = {
   pointLight: {
     position: [1, 2, 1],
     color: 'white',
-    intensity: 10,
-    distance: 500,
+    intensity: 7,
+    distance: 1000,
     decay: 2,
   }
 }
@@ -50,11 +54,10 @@ const SCENE = new ThreeJsScene(sceneConfig).init()
 
 const controlConfig = {
   scene: SCENE,
-  controls: {
-    play: true,
-    pause: true,
-    zoom: true,
+  showControls: {
+    toggleAnimation: true,
     reset: true,
+    zoom: true,
   },
 }
 
