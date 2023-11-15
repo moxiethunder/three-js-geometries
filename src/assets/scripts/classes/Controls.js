@@ -1,17 +1,25 @@
+import * as THREE from 'three'
 import Modal from '@scripts/classes/Modal.js'
-import { createDomElement, addElementToDOM } from '@scripts/utils/utils.js'
+import { createDomElement, findArrayObject } from '@scripts/utils/utils.js'
 import * as ICONS from '@scripts/lib/icons.js'
 
 class Controls {
   constructor(config) {
     this.scene = config.scene
-    this.showControls = config.showControls
+    this.controls = config.controls
     this.cameraZoom = this.scene.camera.position.z
     this.canvas = this.scene.canvas
+    this.type = config.type
 
-    this.fnToggleAnimation = this.scene.animateScene.toggleAnimation.bind(this.scene.animateScene)
-    this.fnReset = this.scene.animateScene.resetCamera.bind(this.scene.animateScene)
-    this.fnZoom = this.scene.animateScene.zoomCamera.bind(this.scene.animateScene)
+    if ( this.type === 'mesh') {
+      this.fnToggleAnimation = this.scene.animateScene.toggleAnimation.bind(this.scene.animateScene)
+      this.fnReset = this.scene.animateScene.resetCamera.bind(this.scene.animateScene)
+      this.fnZoom = this.scene.animateScene.zoomCamera.bind(this.scene.animateScene)
+    }
+
+    if ( this.type === 'camera') {
+      this.fnReset = this.scene.animateScene.resetCamera.bind(this.scene.animateScene)
+    }
 
     this.data = {
       toggleAnimation: {
@@ -22,7 +30,6 @@ class Controls {
           id: 'btn-toggle-animation',
           type: 'button',
           'data-control-button': '',
-          'data-tooltip': 'Toggle animation',
           'data-action-toggle-animation': '',
           'aria-label': 'Toggle animation'
         },
@@ -36,7 +43,6 @@ class Controls {
           id: 'btn-reset',
           type: 'button',
           'data-control-button': '',
-          'data-tooltip': 'Reset camera',
           'data-action-reset': '',
           'aria-label': 'Reset camera'
         },
@@ -50,7 +56,6 @@ class Controls {
           id: 'btn-zoom--in',
           type: 'button',
           'data-control-button': '',
-          'data-tooltip': 'Zoom in',
           'data-btn-zoom': '',
           'data-action-zoom': 'in',
           'aria-label': 'Zoom in'
@@ -65,7 +70,6 @@ class Controls {
           id: 'btn-zoom-out',
           type: 'button',
           'data-control-button': '',
-          'data-tooltip': 'Zoom out',
           'data-btn-zoom': '',
           'data-action-zoom': 'out',
           'aria-label': 'Zoom out'
@@ -96,6 +100,7 @@ class Controls {
     }
 
     this.modal = new Modal({
+      type: 'controls',
       container: this.container,
       icon: ICONS.settings,
     }).mount()
@@ -103,7 +108,7 @@ class Controls {
     this.canvas.setAttribute('data-playing', true)
     this.canvas.setAttribute('data-zoom', this.cameraZoom)
 
-    Object.entries(this.showControls).forEach(([key, val]) => {
+    Object.entries(this.controls).forEach(([key, val]) => {
       if ( !val ) return
       this.createControlElement(key)
     })

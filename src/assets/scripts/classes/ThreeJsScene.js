@@ -2,11 +2,16 @@ import * as THREE from 'three'
 import { getAspectRatio, hasProperty } from '@scripts/utils/utils.js'
 import AnimateCube from '@scripts/classes/AnimateCube.js'
 import AnimateCamera from '@scripts/classes/AnimateCamera.js'
+import Controls from '@scripts/classes/Controls.js'
+import Info from '@scripts/classes/Info.js'
 
 class ThreeJsScene {
   constructor(config = {}) {
     //defaults for config
     const {
+      type = 'none',
+      showControls = false,
+      showInfo = false,
       background = 'black',
       mesh = {
         dims: [2, 2, 2],
@@ -47,11 +52,26 @@ class ThreeJsScene {
 
     //set from config if present, otherwise use defaults
     this.canvas = document.getElementById(config.canvas)
-
+    
     if ( !this.canvas ) {
-      console.error(`No canvas found with selector ${config.canvas}`)
+      console.error(`No canvas element found with an ID of ${config.canvas}`)
       return
     }
+    
+    this.type = config.type || type
+    this.showControls = config.showControls || showControls
+    this.showInfo = config.showInfo || showInfo
+    this.controlsId = config.controlsId
+    this.infoId = config.infoId
+    this.controls = this.type === 'mesh'
+      ? {
+          toggleAnimation: true,
+          reset: true,
+          zoom: true,
+        }
+      : {
+          reset: true,
+        }
 
     this.background = config.background || background
     this.mesh = config.mesh || mesh
@@ -71,7 +91,7 @@ class ThreeJsScene {
   }
   
   setMesh() {
-    const { multicolor, dims, properties, rotation } = this.mesh
+    const { dims, properties, rotation } = this.mesh
     const geometry = new THREE.BoxGeometry(...dims)
     const material = new THREE.MeshStandardMaterial(properties)
     const mesh = new THREE.Mesh(geometry, material)
@@ -151,14 +171,34 @@ class ThreeJsScene {
       renderer: this.renderer,
     }
 
-    // this.renderer.render(this.scene, this.camera)
-    // this.root.setAttribute('data-no-controls', '')
+    if ( this.type === 'mesh' ) {
+      this.animateScene = new AnimateCube(assets).init()
+      this.root.setAttribute('data-mesh-controls', '')
+    } else if ( this.type === 'camera' ) {
+      this.animateScene = new AnimateCamera(assets).init()
+      this.root.setAttribute('data-camera-controls', '')
+    } else {
+      this.renderer.render(this.scene, this.camera)
+      this.root.setAttribute('data-no-controls', '')
+    }
 
-    this.animateScene = new AnimateCube(assets).init()
-    this.root.setAttribute('data-mesh-controls', '')
+    if ( this.showInfo && this.type !== 'none' ) {
+      if ( this.infoId === undefined ) {
+        console.error('No selector for info panel provided')
+        return
+      }
 
-    // this.animateScene = new AnimateCamera(assets).init()
-    // this.root.setAttribute('data-camera-controls', '')
+      this.infoPanel = new Info({type: this.type, scene: this}).mount(this.infoId)
+    }
+
+    if ( this.showControls && this.type !== 'none' ) {
+      if ( this.controlsId === undefined ) {
+        console.error('No selector for controls panel provided')
+        return
+      }
+
+      this.controlsPanel = new Controls({type: this.type, scene: this, controls: this.controls}).mount(this.controlsId)
+    }
 
     return this
   }

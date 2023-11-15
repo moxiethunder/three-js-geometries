@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import gsap from 'gsap'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { getPointerPOS } from '@scripts/utils/utils.js'
+import { findArrayObject } from '@scripts/utils/utils'
 
 class AnimateCamera {
   constructor(config) {
@@ -10,6 +11,11 @@ class AnimateCamera {
     this.mesh = config.mesh
     this.camera = config.camera
     this.renderer = config.renderer
+    this.ogData = this.getOgData({
+      arrayToCheck: this.scene.children,
+      instance: THREE.PerspectiveCamera,
+      props: ['position', 'fov']
+    })
 
     this.vars = {
       isDragging: false,
@@ -29,11 +35,11 @@ class AnimateCamera {
   }
 
   animate() {
+    requestAnimationFrame(() => this.animate())
     if ( this.vars.isDragging ) {
       this.panOnDrag()
     }
     this.renderer.render(this.scene, this.camera)
-    requestAnimationFrame(() => this.animate())
   }
   
   setCameraCoords(e) {
@@ -109,6 +115,27 @@ class AnimateCamera {
   onMouseUp(e) {
     this.vars.isDragging = false
     this.canvas.removeAttribute('data-grabbing')
+  }
+
+  getOgData(data) {
+    const { arrayToCheck, instance, props } = data;
+    const info = findArrayObject(arrayToCheck, instance);
+  
+    return props.reduce((acc, prop) => {
+      if (typeof info[prop] === 'object' && info[prop] !== null) {
+        acc[prop] = info[prop].clone();
+      } else {
+        acc[prop] = info[prop];
+      }
+      return acc;
+    }, {});
+  }
+
+  resetCamera() {
+    this.camera.position.set(...this.ogData.position)
+    this.camera.fov = this.ogData.fov
+    this.camera.updateProjectionMatrix()
+    this.camera.lookAt(this.mesh.position)
   }
 
   init() {

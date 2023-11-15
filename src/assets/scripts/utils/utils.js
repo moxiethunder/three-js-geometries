@@ -30,19 +30,26 @@ export function getDeltaTime(time) {
   }
 }
 
+export function findArrayObject(array, instance) {
+  return array.find(item => item instanceof instance)
+}
+
 export function hasProperty(obj, prop) {
   return obj.hasOwnProperty(prop) ? true : false
 }
 
+export function setElementAttributes(element, attributes) {
+  Object.entries(attributes).forEach(([key, value]) => {
+    element.setAttribute(key, value)
+  })
+}
 
 export function createDomElement(config) {
   const { type, props=null, classes=null, icon=null } = config
   const element = document.createElement(type)
 
   if ( props ) {
-    Object.entries(props).forEach(([key, value]) => {
-      element.setAttribute(key, value)
-    })
+    setElementAttributes(element, props)
   }
 
   if ( classes ) {

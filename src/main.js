@@ -1,7 +1,5 @@
 import '@styles/main.scss'
 import ThreeJsScene from '@scripts/classes/ThreeJsScene.js'
-import Controls from '@scripts/classes/Controls.js'
-import Modal from '@scripts/classes/Modal.js'
 
 const sizes = {
   // width: window.innerWidth,
@@ -11,6 +9,7 @@ const sizes = {
 }
 
 const sceneConfig = {
+  type: 'camera',
   canvas: 'threejs-cube',
   background: 'black',
   mesh: {
@@ -28,7 +27,7 @@ const sceneConfig = {
   },
   camera: {
     fov: 75,
-    position: [0, 0, 4],
+    position: [0, 0, 2],
     aspect: {
       width: sizes.width,
       height: sizes.height,
@@ -48,17 +47,11 @@ const sceneConfig = {
     intensity: 7,
     distance: 1000,
     decay: 2,
-  }
-}
-const SCENE = new ThreeJsScene(sceneConfig).init()
-
-const controlConfig = {
-  scene: SCENE,
-  showControls: {
-    toggleAnimation: true,
-    reset: true,
-    zoom: true,
   },
+  showControls: true,
+  showInfo: true,
+  controlsId: 'animation-controls',
+  infoId: 'info-panel',
 }
 
-const CONTROLS = new Controls(controlConfig).mount('animation-controls')
+const SCENE = new ThreeJsScene(sceneConfig).init()
