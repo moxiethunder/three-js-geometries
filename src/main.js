@@ -2,8 +2,6 @@ import '@styles/main.scss'
 import ThreeJsScene from '@scripts/classes/ThreeJsScene.js'
 
 const sizes = {
-  // width: window.innerWidth,
-  // height: window.innerHeight
   width: document.documentElement.clientWidth,
   height: document.documentElement.clientHeight,
 }
@@ -21,12 +19,12 @@ const sceneConfig = {
       metalness: 0.5,
     },
     rotation: {
-      x: Math.PI * 0,
-      y: Math.PI * 0,
+      x: Math.PI * 0.125,
+      y: Math.PI * 0.25,
     }
   },
   camera: {
-    fov: 75,
+    fov: 65,
     position: [0, 0, 2],
     aspect: {
       width: sizes.width,
@@ -39,12 +37,12 @@ const sceneConfig = {
   },
   ambientLight: {
     color: '#ffffff',
-    intensity: 0.5,
+    intensity: 0.25,
   },
   pointLight: {
     position: [1, 2, 1],
     color: 'white',
-    intensity: 7,
+    intensity: 5,
     distance: 1000,
     decay: 2,
   },

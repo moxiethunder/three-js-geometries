@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import EventBus from '@scripts/services/EventBus'
 import gsap from 'gsap'
 
 class AnimateCube {
@@ -23,12 +24,15 @@ class AnimateCube {
 
   animate() {
     requestAnimationFrame(this.animate.bind(this))
-
+    
     if (!this.vars.isDragging && this.vars.isRotating) {
       const elapsedTime = this.vars.clock.getElapsedTime()
-
+      
       this.mesh.rotation.x = this.vars.rotationPosition.x + elapsedTime * this.vars.VELOCITY
       this.mesh.rotation.y = this.vars.rotationPosition.y + elapsedTime * this.vars.VELOCITY
+      
+      this.camera.lookAt(this.mesh.position)
+      EventBus.publish('MeshUpdated', this.mesh)
     }
 
     this.renderer.render(this.scene, this.camera);
@@ -60,6 +64,8 @@ class AnimateCube {
         y: this.vars.rotationPosition.y + rotateAngleY,
         duration: 1,
       })
+
+      EventBus.publish('MeshUpdated', this.mesh)
     }
   }
 
@@ -97,11 +103,14 @@ class AnimateCube {
     }
 
     this.canvas.setAttribute('data-zoom', pos)
+
+    EventBus.publish('CameraUpdated', this.camera)
   }
 
   resetCamera(e, el) {
     this.camera.position.z = this.vars.defaultZoom
     this.canvas.setAttribute('data-zoom', this.camera.position.z)
+    EventBus.publish('CameraUpdated', this.camera)
   }
 
   restartAnimation() {

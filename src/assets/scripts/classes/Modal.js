@@ -14,7 +14,7 @@ class Modal {
         'data-collapsible': '',
         'aria-expanded': 'false',
       },
-      classes: [this.containerID + '__inner'],
+      classes: [`${this.containerID}__inner`],
     })
   }
 

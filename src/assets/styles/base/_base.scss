@@ -14,6 +14,8 @@ canvas {
   }
 }
 
+
+
 [data-modal] {
   position: absolute;
   display: flex;
@@ -25,6 +27,18 @@ canvas {
   border-radius: toRem(4);
 
   padding: toRem(10);
+
+  .info-node {
+    color: white;
+    font-family: sans-serif;
+    font-size: toRem(12);
+    white-space: nowrap;
+  
+    span {
+      color: $clr-teal;
+      font-size: toRem(18);
+    }
+  }
 
   &[data-modal-open] {
     gap: toRem(24);
@@ -50,6 +64,7 @@ canvas {
     }
     
     [data-collapsible] {
+      align-items: flex-end;
       svg {
         margin-inline: auto;
         margin-bottom: toRem(8);

@@ -171,6 +171,15 @@ class ThreeJsScene {
       renderer: this.renderer,
     }
 
+    if ( this.showInfo && this.type !== 'none' ) {
+      if ( this.infoId === undefined ) {
+        console.error('No selector for info panel provided')
+        return
+      }
+
+      this.infoPanel = new Info({type: this.type, scene: this}).mount(this.infoId)
+    }
+
     if ( this.type === 'mesh' ) {
       this.animateScene = new AnimateCube(assets).init()
       this.root.setAttribute('data-mesh-controls', '')
@@ -180,15 +189,6 @@ class ThreeJsScene {
     } else {
       this.renderer.render(this.scene, this.camera)
       this.root.setAttribute('data-no-controls', '')
-    }
-
-    if ( this.showInfo && this.type !== 'none' ) {
-      if ( this.infoId === undefined ) {
-        console.error('No selector for info panel provided')
-        return
-      }
-
-      this.infoPanel = new Info({type: this.type, scene: this}).mount(this.infoId)
     }
 
     if ( this.showControls && this.type !== 'none' ) {
