@@ -39,7 +39,7 @@ export class Info {
   createInfoSet(config) {
     const { type='div', task, text, object } = config
 
-    if ( !task || !text || !object ) {
+    if ( !task || !text || object === undefined ) {
       console.error('Missing required parameters in config object')
       return null
     }

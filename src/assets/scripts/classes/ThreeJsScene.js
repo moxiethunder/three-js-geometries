@@ -95,7 +95,7 @@ class ThreeJsScene {
     const geometry = new THREE.BoxGeometry(...dims)
     const material = new THREE.MeshStandardMaterial(properties)
     const mesh = new THREE.Mesh(geometry, material)
-    mesh.rotation.set(rotation.x, rotation.y, rotation.z = 0)
+    mesh.rotation.set(rotation.x=0, rotation.y=0, rotation.z=0)
 
     return mesh
   }

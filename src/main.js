@@ -7,7 +7,7 @@ const sizes = {
 }
 
 const sceneConfig = {
-  type: 'camera',
+  type: 'mesh',
   canvas: 'threejs-cube',
   background: 'black',
   mesh: {
@@ -19,8 +19,10 @@ const sceneConfig = {
       metalness: 0.5,
     },
     rotation: {
-      x: Math.PI * 0.125,
-      y: Math.PI * 0.25,
+      x: 0,
+      y: 0,
+      // x: Math.PI * 0.125,
+      // y: Math.PI * 0.25,
     }
   },
   camera: {
