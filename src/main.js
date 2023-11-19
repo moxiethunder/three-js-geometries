@@ -1,9 +1,13 @@
 import '@styles/main.scss'
-import ThreeJsScene from '@scripts/classes/ThreeJsScene.js'
+import ThreeJsScene from '@scripts/classes/ThreeJsScene'
+import EventBus from '@scripts/services/EventBus'
+import { rerenderScene } from '@scripts/services/EventHandlers'
+
+EventBus.subscribe('WindowResized', rerenderScene)
 
 const sizes = {
-  width: document.documentElement.clientWidth,
-  height: document.documentElement.clientHeight,
+  width: window.innerWidth,
+  height: window.innerHeight,
 }
 
 const sceneConfig = {
@@ -48,10 +52,16 @@ const sceneConfig = {
     distance: 1000,
     decay: 2,
   },
-  showControls: true,
-  showInfo: true,
+  showControlPanel: true,
+  showInfoPanel: true,
+  showSceneControls: true,
   controlsId: 'animation-controls',
   infoId: 'info-panel',
+  sceneControlsId: 'scene-controls',
 }
 
 const SCENE = new ThreeJsScene(sceneConfig).init()
+
+window.addEventListener('resize', (e) => {
+  EventBus.publish('WindowResized', {e, sizes, SCENE})
+})

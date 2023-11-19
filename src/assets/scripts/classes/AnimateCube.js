@@ -9,6 +9,8 @@ class AnimateCube {
     this.mesh = config.mesh
     this.camera = config.camera
     this.renderer = config.renderer
+    this.showInfoPanel = config.show.infoPanel
+    this.showControlPanel = config.show.controlPanel
 
     this.vars = {
       DELAY: 250,
@@ -32,7 +34,7 @@ class AnimateCube {
       this.mesh.rotation.y = this.vars.rotationPosition.y + elapsedTime * this.vars.VELOCITY
       
       this.camera.lookAt(this.mesh.position)
-      EventBus.publish('MeshUpdated', this.mesh)
+      if ( this.showInfoPanel ) EventBus.publish('MeshUpdated', this.mesh)
     }
 
     this.renderer.render(this.scene, this.camera);
@@ -65,7 +67,7 @@ class AnimateCube {
         duration: 1,
       })
 
-      EventBus.publish('MeshUpdated', this.mesh)
+      if ( this.showInfoPanel ) EventBus.publish('MeshUpdated', this.mesh)
     }
   }
 
@@ -104,13 +106,13 @@ class AnimateCube {
 
     this.canvas.setAttribute('data-zoom', pos)
 
-    EventBus.publish('CameraUpdated', this.camera)
+    if ( this.showInfoPanel ) EventBus.publish('CameraUpdated', this.camera)
   }
 
   resetCamera(e, el) {
     this.camera.position.z = this.vars.defaultZoom
     this.canvas.setAttribute('data-zoom', this.camera.position.z)
-    EventBus.publish('CameraUpdated', this.camera)
+    if ( this.showInfoPanel ) EventBus.publish('CameraUpdated', this.camera)
   }
 
   restartAnimation() {

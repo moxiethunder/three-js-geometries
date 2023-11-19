@@ -1,17 +1,20 @@
 import * as THREE from 'three'
-import { getAspectRatio, hasProperty } from '@scripts/utils/utils.js'
-import AnimateCube from '@scripts/classes/AnimateCube.js'
-import AnimateCamera from '@scripts/classes/AnimateCamera.js'
-import Controls from '@scripts/classes/Controls.js'
-import Info from '@scripts/classes/Info.js'
+import { getAspectRatio, hasProperty } from '@scripts/utils/utils'
+import { setPixelRatio } from '@scripts/utils/render-utils'
+import AnimateCube from '@scripts/classes/AnimateCube'
+import AnimateCamera from '@scripts/classes/AnimateCamera'
+import Controls from '@scripts/classes/Controls'
+import Info from '@scripts/classes/Info'
+import Inputs from '@scripts/classes/Inputs'
 
 class ThreeJsScene {
   constructor(config = {}) {
     //defaults for config
     const {
       type = 'none',
-      showControls = false,
-      showInfo = false,
+      showControlPanel = false,
+      showInfoPanel = false,
+      showSceneControls = false,
       background = 'black',
       mesh = {
         dims: [2, 2, 2],
@@ -59,10 +62,12 @@ class ThreeJsScene {
     }
     
     this.type = config.type || type
-    this.showControls = config.showControls || showControls
-    this.showInfo = config.showInfo || showInfo
+    this.showControlPanel = config.showControlPanel || showControlPanel
+    this.showInfoPanel = config.showInfoPanel || showInfoPanel
+    this.showSceneControls = config.showSceneControls || showSceneControls
     this.controlsId = config.controlsId
     this.infoId = config.infoId
+    this.sceneControlsId = config.sceneControlsId
     this.controls = this.type === 'mesh'
       ? {
           toggleAnimation: true,
@@ -137,6 +142,7 @@ class ThreeJsScene {
       canvas: this.canvas
     })
     renderer.setSize(width, height)
+    setPixelRatio(renderer)
 
     return renderer
   }
@@ -169,9 +175,22 @@ class ThreeJsScene {
       // camera: this.orthoCamera,
       camera: this.camera,
       renderer: this.renderer,
+      show: {
+        controlPanel: this.showControlPanel,
+        infoPanel: this.showInfoPanel,
+      }
     }
 
-    if ( this.showInfo && this.type !== 'none' ) {
+    if ( this.showSceneControls && this.type !== 'none' ) {
+      if ( this.sceneControlsId === undefined ) {
+        console.error('No selector for scene controls provided')
+        return
+      }
+      
+      this.sceneControlPanel = new Inputs({scene: this}).mount(this.sceneControlsId)
+    }
+
+    if ( this.showInfoPanel && this.type !== 'none' ) {
       if ( this.infoId === undefined ) {
         console.error('No selector for info panel provided')
         return
@@ -191,13 +210,13 @@ class ThreeJsScene {
       this.root.setAttribute('data-no-controls', '')
     }
 
-    if ( this.showControls && this.type !== 'none' ) {
+    if ( this.showControlPanel && this.type !== 'none' ) {
       if ( this.controlsId === undefined ) {
         console.error('No selector for controls panel provided')
         return
       }
 
-      this.controlsPanel = new Controls({type: this.type, scene: this, controls: this.controls}).mount(this.controlsId)
+      this.controlPanel = new Controls({type: this.type, scene: this, controls: this.controls}).mount(this.controlsId)
     }
 
     return this

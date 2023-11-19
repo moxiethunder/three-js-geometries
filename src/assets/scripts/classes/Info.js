@@ -1,8 +1,8 @@
-import * as ICONS from '@scripts/lib/icons.js'
-import { createDomElement, createSvgNode, setElementAttributes } from '@scripts/utils/utils.js'
-import { renderCameraData, renderMeshData } from '@scripts/utils/render-data.js'
-import Modal from '@scripts/classes/Modal.js'
-import EventBus from '@scripts/services/EventBus.js'
+import * as ICONS from '@scripts/lib/icons'
+import { createDomElement, createSvgNode, setElementAttributes } from '@scripts/utils/utils'
+import { renderCameraData, renderMeshData } from '@scripts/utils/render-data'
+import Modal from '@scripts/classes/Modal'
+import EventBus from '@scripts/services/EventBus'
 
 export class Info {
   constructor(config) {

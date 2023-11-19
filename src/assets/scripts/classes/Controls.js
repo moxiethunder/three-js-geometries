@@ -96,7 +96,7 @@ class Controls {
     
     if (!this.container) {
       console.error(`No container found with selector ${selector}`)
-      return
+      return null
     }
 
     this.modal = new Modal({

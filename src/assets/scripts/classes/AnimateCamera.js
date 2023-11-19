@@ -1,9 +1,7 @@
 import * as THREE from 'three'
 import gsap from 'gsap'
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { getPointerPOS } from '@scripts/utils/utils.js'
 import { findArrayObject } from '@scripts/utils/utils'
-import { renderCameraData, renderMeshData } from '@scripts/utils/render-data.js'
 import EventBus from '@scripts/services/EventBus.js'
 
 class AnimateCamera {
@@ -13,6 +11,9 @@ class AnimateCamera {
     this.mesh = config.mesh
     this.camera = config.camera
     this.renderer = config.renderer
+    this.showInfoPanel = config.show.infoPanel
+    this.showControlPanel = config.show.controlPanel
+
     this.ogData = this.getOgData({
       arrayToCheck: this.scene.children,
       instance: THREE.PerspectiveCamera,
@@ -40,7 +41,7 @@ class AnimateCamera {
     requestAnimationFrame(() => this.animate())
     if ( this.vars.isDragging ) {
       this.panOnDrag()
-      EventBus.publish('CameraUpdated', this.camera)
+      if ( this.showInfoPanel ) EventBus.publish('CameraUpdated', this.camera)
     }
     this.renderer.render(this.scene, this.camera)
   }
@@ -87,7 +88,7 @@ class AnimateCamera {
       }
     })
 
-    EventBus.publish('CameraUpdated', this.camera)
+    if ( this.showInfoPanel ) EventBus.publish('CameraUpdated', this.camera)
   }
 
   attachEventListeners() {
@@ -141,7 +142,7 @@ class AnimateCamera {
     this.camera.fov = this.ogData.fov
     this.camera.updateProjectionMatrix()
     this.camera.lookAt(this.mesh.position)
-    EventBus.publish('CameraUpdated', this.camera)
+    if ( this.showInfoPanel ) EventBus.publish('CameraUpdated', this.camera)
   }
 
   init() {
