@@ -50,5 +50,7 @@ export function handleSceneInputs(data) {
     }
   }
 
-  rangeSlider(element, value, e)
+  if ( Array.from(element.children).includes(element.querySelector('[data-range-item]'))) {
+    rangeSlider(element, value, e)
+  }
 }
