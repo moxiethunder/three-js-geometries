@@ -1,7 +1,11 @@
 class EvBus {
-  // CameraUpdated in ./src/assets/scripts/classes/Info.js
   constructor() {
-    this.listeners = {};
+    if (!EvBus.instance) {
+      this.listeners = {}
+      EvBus.instance = this
+    }
+    
+    return EvBus.instance;
   }
 
   publish(event, data) {

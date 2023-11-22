@@ -1,0 +1,7 @@
+[mxt_orbit-controls] {
+  cursor: grab;
+
+  &[mxt_grabbing] {
+    cursor: grabbing;
+  }
+}

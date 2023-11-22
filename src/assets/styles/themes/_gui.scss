@@ -1,0 +1,51 @@
+$darkTheme: (
+  dark: #18181a,
+  dark2: #242526,
+  dark3: #3a3b3c,
+  dark4: #404040,
+  light1: #e4e6eb,
+  light2: #b0b3b8,
+  blue: #09e4fb,
+  pink: #f962a7,
+  green: #abe842,
+);
+
+$dark: #18181a;
+$dark2: #242526;
+$dark3: #3a3b3c;
+$dark4: #404040;
+$light1: #e4e6eb;
+$light2: #b0b3b8;
+$blue: #09e4fb;
+$pink: #f962a7;
+$green: #abe842;
+
+[mxt_theme_dark] {
+  &.lil-gui {
+    .title {
+      color: $pink;
+    }
+  }
+  
+}
+
+#mxt-controlsGUI {
+
+  &--controls,
+  &--stats {
+    position: absolute;
+    margin: toRem(14);
+    z-index: 100;
+  }
+
+  &--controls {
+    top: 0;
+    right: 0;
+  }
+
+  &--stats {
+    top: unset;
+    bottom: 0;
+    left: 0;
+  }
+}

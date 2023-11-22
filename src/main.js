@@ -1,67 +1,94 @@
 import '@styles/main.scss'
-import ThreeJsScene from '@scripts/classes/ThreeJsScene'
 import EventBus from '@scripts/services/EventBus'
-import { rerenderScene } from '@scripts/services/EventHandlers'
+import { renderOnResize } from '@scripts/services/event-handlers'
+import setupGlobalListeners from '@scripts/services/global-listeners'
+import ThreeScene from '@scripts/classes/ThreeScene'
 
-EventBus.subscribe('WindowResized', rerenderScene)
+/**
+ * 
+ * Fix sizes to pass into event listeners
+ * Add wireframe in BoxGeometry to rotate animation
+ * Check on OrbitControls açc12utoRotate property
+ * Add MeshStandardMaterial tranparency and opacity to GUI
+ * Write color functions for GUI pickers
+ * Create a style theme for GUI
+ * Add font to site - space mono and space grostesque
+ * Create hide/show functions for GUI
+ * Create function to collapse/expand all folders
+ */
 
-const sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight,
-}
 
-const sceneConfig = {
-  type: 'mesh',
-  canvas: 'threejs-cube',
-  background: '#242424',
-  mesh: {
-    dims: [1, 1, 1],
-    properties: {
-      color: '#ffffff',
-      wireframe: false,
-      roughness: 0.5,
-      metalness: 0.5,
+const threeScene = new ThreeScene({
+  // showStats: true,
+  // showSegments: true,
+  orbitControls: true,
+  animateMesh: true,
+  startPaused: true,
+  cameraConfig: {
+    // focus: 5,
+    position: {
+      x: 0.31,
+      y: 1.61,
+      z: 4.75,
     },
+  },
+  materialConfig: {
+    // emissive: 0x049ef4,
+    color: 0xff0000,
+    transparent: false,
+    opacity: 1,
+    roughness: 0.25,
+    metalness: 0.75,
+  },
+  meshConfig: {
     rotation: {
-      x: 0,
-      y: 0,
-      // x: Math.PI * 0.125,
-      // y: Math.PI * 0.25,
+      x: Math.PI * 0.125,
+      y: Math.PI * 0.25,
+      z: 0,
+    },
+  },
+  lightTypes: [
+    {
+      name: 'AmbientLight',
+      config: {
+        intensity: 0.5,
+      },
+    },
+    {
+      name: 'PointLight',
+      config: {
+        color: 0xffffff,
+        intensity: 12,
+        distance: 1000,
+        decay: 2,
+        position: {
+          x: 1,
+          y: 2,
+          z: 1,
+        },
+      },
     }
-  },
-  camera: {
-    fov: 65,
-    position: [0, 0, 2],
-    aspect: {
-      width: sizes.width,
-      height: sizes.height,
+    // {
+    //   name: 'DirectionalLight',
+    //   config: {
+    //     intensity: 5,
+    //     position: {
+    //       x: 0,
+    //       y: 0,
+    //       z: 0,
+    //     },
+    //   },
+    // },
+  ],
+  helpers: [
+    {
+      type: 'AxesHelper',
+      config: [5]
     }
-  },
-  renderer: {
-    width: sizes.width,
-    height: sizes.height,
-  },
-  ambientLight: {
-    color: '#ffffff',
-    intensity: 0.75,
-  },
-  pointLight: {
-    position: [1, 2, 1],
-    color: 'white',
-    intensity: 12,
-    distance: 1000,
-    decay: 2,
-  },
-  showControlPanel: true,
-  showInfoPanel: true,
-  showSceneControls: true,
-  controlsId: 'animation-controls',
-  infoId: 'info-panel',
-  sceneControlsId: 'scene-controls',
-}
-
-const SCENE = new ThreeJsScene(sceneConfig).init()
-
-window.addEventListener('resize', (e) => {
-  EventBus.publish('WindowResized', {e, sizes, SCENE})
+  ]
 })
+
+threeScene.init({id: 'scene', requireCanvas: true})
+
+EventBus.subscribe('WindowResized', renderOnResize)
+setupGlobalListeners(threeScene)
