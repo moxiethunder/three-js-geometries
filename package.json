@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "bunx --bun vite",
     "build": "bunx --bun vite build",
-    "preview": "bunx --bun vite preview"
+    "preview": "bunx --bun vite preview",
+    "deploy": "firebase deploy --only hosting"
   },
   "devDependencies": {
     "lil-gui": "^0.19.1",

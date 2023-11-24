@@ -1,9 +1,9 @@
 const coneGeometryConfig = {
-  radius: 2,
-  height: 4,
+  radius: 1,
+  height: 2,
   radialSegments: 12,
-  heightSegments: 1,
-  openEnded: false,
+  heightSegments: 8,
+  openEnded: true,
 }
 
 export default coneGeometryConfig
