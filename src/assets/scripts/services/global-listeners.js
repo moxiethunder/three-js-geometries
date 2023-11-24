@@ -6,6 +6,11 @@ const setupGlobalListeners = (scene) => {
   window.addEventListener('resize', (e) => {
     EventBus.publish('WindowResized', {e, scene})
   })
+
+  window.addEventListener('keydown', (e) => {
+    EventBus.publish('KeyDown', e)
+  })
+  
   window.addEventListener('mousedown', e => {
     isDragging = true
     // EventBus.publish('DragStart', {e, isDragging, scene})
@@ -17,7 +22,7 @@ const setupGlobalListeners = (scene) => {
   })
   
   window.addEventListener('mousemove', e => {
-    if ( isDragging ) EventBus.publish('DragMove', {e, isDragging, scene})
+    // if ( isDragging ) EventBus.publish('DragMove', {e, isDragging, scene})
   })
 }
 

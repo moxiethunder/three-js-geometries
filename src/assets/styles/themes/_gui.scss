@@ -10,26 +10,107 @@ $darkTheme: (
   green: #abe842,
 );
 
-$dark: #18181a;
-$dark2: #242526;
-$dark3: #3a3b3c;
-$dark4: #404040;
-$light1: #e4e6eb;
-$light2: #b0b3b8;
-$blue: #09e4fb;
-$pink: #f962a7;
+$clr-dark-800: #18181a;
+$clr-dark-600: #242526;
+$clr-dark-400: #3a3b3c;
+$clr-dark-200: #404040;
+$clr-light-200: #e4e6eb;
+$clr-light-400: #b0b3b8;
+$clr-blue: #09e4fb;
+$clr-pink: #f962a7;
 $green: #abe842;
 
 [mxt_theme_dark] {
   &.lil-gui {
-    .title {
-      color: $pink;
+    > .title {
+      font-size: toRem(14);
     }
+    // Expand trigger & title
+    .title {
+      color: $clr-light-200;
+      height: unset;
+      background-color: $clr-dark-800;
+      opacity: 1;
+      padding: toRem(8) toRem(16);
+
+      &:hover {
+        color: $clr-pink;
+      }
+    }
+
+    .lil-gui {
+      .title {
+        font-size: toRem(12);
+
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
+
+    .children {
+      background-color: $clr-dark-600;
+      padding: toRem(10);
+
+      > .lil-gui {
+        &:not(:first-of-type) {
+          margin-top: toRem(6);
+        }
+
+        .title {
+          border: none;
+        }
+      }
+    }
+
+    .controller {
+
+      &:not(:first-of-type) {
+        margin-top: toRem(10);
+      }
+      // Function buttons
+      &.function {
+        button {
+          color: $clr-dark-800;
+          font-size: toRem(12);
+          text-transform: uppercase;
+          background-color: $clr-pink;
+          padding-inline: toRem(16);
+          padding-block: toRem(8);
+          height: auto;
+        }
+      }
+
+      &.hasSlider {
+        .fill {
+          background-color: $clr-light-400;
+          border-right: 4px solid $clr-blue;
+        }
+      }
+    }
+
+    [mxt_gui_helpers] {
+
+    }
+
+    // [mxt_gui_functions] {
+    //   &.closed {
+    //     .children {
+    //       display: none;
+    //     }
+    //   }
+    //   .children {
+    //     display: flex;
+    //   }
+
+    //   .controller {
+    //     margin-top: 4px;
+    //   }
+    // }
   }
-  
 }
 
-#mxt-controlsGUI {
+#mxt-gui {
 
   &--controls,
   &--stats {

@@ -13,63 +13,80 @@ const defaultSceneConfig = {
     color: 0x000000,
   },
 
-  // OBJECTS & CONFIGS
+  // OBJECTS
   materialType: material,
-  materialConfig: {},
   cameraType: camera,
-  cameraConfig:{},
   geometryType: geometry,
-  geometryConfig:{},
+
+  // OBJECT CONFIGS
+  cameraConfig: {
+    position: {
+      x: 0.31,
+      y: 1.61,
+      z: 4.75,
+    },
+  },
+  materialConfig: {
+    color: 0xff0000,
+    transparent: false,
+    opacity: 1,
+    roughness: 0.25,
+    metalness: 0.75,
+  },
+  meshConfig: {
+    rotation: {
+      x: Math.PI * 0.125,
+      y: Math.PI * 0.25,
+      z: 0,
+    },
+  },
 
   // LIGHTS
   lightTypes: [
     {
-      name: light[0],
-      config: {},
+      name: light[1],
+      config: {
+        intensity: 0.5,
+      },
     },
     {
-      name: light[1],
-      config: {},
-    },
+      name: light[0],
+      config: {
+        color: 0xffffff,
+        intensity: 12,
+        distance: 50,
+        decay: 2,
+        position: {
+          x: 1,
+          y: 2,
+          z: 1,
+        },
+      },
+    }
   ],
 
   // CONTOLS & HELPERS
-  orbitControls: false,
-  animateMesh: false,
-  guiPanels: {
-    controlSet: 'full', // full || minimal
-    showSceneHelpers: true,
-    showFunctions: true,
-    showStats: true,
-    showControls: [
-      'scene',
-      'camera',
-      'mesh',
-      'material',
-      'light',
-    ]
-  },
-  helpers: [
-    // {
-    //   type: 'CameraHelper',
-    // },
-    // {
-    //   type: 'BoxHelper',
-    //   config: [0xffff00]
-    // },
-    // {
-    //   type: 'AxesHelper',
-    //   config: [5]
-    // },
-    // {
-    //   type: 'GridHelper',
-    //   config: [10, 16, 0x0000ff, 0x808080]
-    // },
-    // {
-    //   type: 'PolarGridHelper',
-    //   config: [5, 8, 16, 64, 0x0000ff, 0x808080]
-    // }
-  ],
+  orbitControls: true,
+  animateMesh: true,
+  startPaused: true,
+  showGUI: true,
+  /**
+   * See GuiPanel.js for more info
+   * guiPanels: {
+   * controlSet: 'full', // full || minimal
+   * showHelpers: true,
+   * showFunctions: true,
+   * showStats: true,
+   * showSegments: true,
+   * showControls: [
+   * 'scene',
+   * 'camera',
+   * 'mesh',
+   * 'material',
+   * 'light',
+   * ]
+   * }
+   */
 }
 
 export default defaultSceneConfig

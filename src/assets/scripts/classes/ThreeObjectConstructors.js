@@ -2,11 +2,13 @@
 
 import ConeGeometry from '@scripts/objects/geometries/ConeGeometry'
 import BoxGeometry from '@scripts/objects/geometries/BoxGeometry'
+import SphereGeometry from '@scripts/objects/geometries/SphereGeometry'
 import MeshStandardMaterial from '@scripts/objects/materials/MeshStandardMaterial'
 import AmbientLight from '@scripts/objects/lights/AmbientLight'
 import PointLight from '@scripts/objects/lights/PointLight'
 import DirectionalLight from '@scripts/objects/lights/DirectionalLight'
 import PerspectiveCamera from '@scripts/objects/cameras/PerspectiveCamera'
+import SpotLight from '@scripts/objects/lights/SpotLight'
 
 const ThreeObjectConstructors = {
   ConeGeometry,
@@ -15,7 +17,9 @@ const ThreeObjectConstructors = {
   AmbientLight,
   PointLight,
   DirectionalLight,
-  PerspectiveCamera
+  PerspectiveCamera,
+  SpotLight,
+  SphereGeometry,
 }
 
 export default ThreeObjectConstructors

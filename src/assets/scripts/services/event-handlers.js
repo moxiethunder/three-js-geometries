@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { setPixelRatio } from '@scripts/utils/render-utils'
 
 export function renderOnResize(data) {
-  const { e, scene } = data
+  const { scene } = data
   const { camera, renderer } = scene
 
   const width = window.innerWidth
