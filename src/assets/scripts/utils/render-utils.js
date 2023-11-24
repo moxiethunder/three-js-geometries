@@ -51,7 +51,6 @@ export function createWireframe(geometry, mesh, config) {
   setWireframeProperties(newWireframe, config)
   mesh.add(newWireframe)
   
-  console.log(mesh)
   return newWireframe
 }
 
