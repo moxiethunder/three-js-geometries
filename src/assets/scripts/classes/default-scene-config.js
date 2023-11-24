@@ -68,7 +68,7 @@ const defaultSceneConfig = {
   // CONTOLS & HELPERS
   orbitControls: true,
   animateMesh: true,
-  startPaused: true,
+  startPaused: false,
   showGUI: true,
   /**
    * See GuiPanel.js for more info

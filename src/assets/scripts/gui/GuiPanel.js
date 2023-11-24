@@ -77,7 +77,7 @@ class GuiPanel {
       })
     }
 
-
+    this.addPropertiesToGui()
 
     EventBus.subscribe('GeometryUpdated', this.updateWireframeControl.bind(this))
   }
@@ -392,6 +392,12 @@ class GuiPanel {
 
   buildControllersArray(folder) {
     this.GuiElements.controllers.push(...folder.controllers)
+  }
+
+  addPropertiesToGui() {
+    const arr = this.GuiWrapper.children
+    const first = arr.find(item => item instanceof GUI)
+    first.domElement.setAttribute('mxt_gui_first', '')
   }
 }
 

@@ -53,8 +53,10 @@ $green: #abe842;
       padding: toRem(10);
 
       > .lil-gui {
-        &:not(:first-of-type) {
-          margin-top: toRem(6);
+        margin-top: toRem(6);
+
+        &[mxt_gui_first] {
+          margin-top: toRem(16);
         }
 
         .title {
