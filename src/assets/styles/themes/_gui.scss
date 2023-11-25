@@ -20,6 +20,12 @@ $clr-blue: #09e4fb;
 $clr-pink: #f962a7;
 $green: #abe842;
 
+#mxt_debug_gui {
+  position: absolute;
+  top: toRem(10);
+  left: toRem(10);
+}
+
 [mxt_theme_dark] {
   &.lil-gui {
     > .title {
