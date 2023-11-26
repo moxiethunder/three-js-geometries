@@ -10,47 +10,119 @@ const configureMaterials = () => {
     doorNormal: '/textures/door/normal.jpg',
     doorRoughness: '/textures/door/roughness.jpg',
     gradient: '/textures/gradients/3.jpg',
-    matcap: '/textures/matcaps/1.png',
+    matcap: '/textures/matcaps/8.png',
   }
   
   const materialsConfig = {
-    MeshBasicMaterial: (texture) => ({
-      map: prepareTexture(texture.doorColor, {
-        colorSpace: THREE.SRGBColorSpace
-      }),
-      color: '#ff0000',
-      wireframe: false,
-      transparent: true,
-      opacity: 0.5,
-      alphaMap: texture.doorAlpha,
-      side: THREE.DoubleSide,
+    MeshBasicMaterial: (textures) => ({
+      showLight: false,
+      material: {
+        map: prepareTexture(textures.doorColor, {
+          colorSpace: THREE.SRGBColorSpace
+        }),
+        color: '#ffffff',
+        wireframe: false,
+        transparent: true,
+        opacity: 0.5,
+        alphaMap: prepareTexture(textures.doorAlpha, {
+          colorSpace: THREE.SRGBColorSpace
+        }),
+        side: THREE.DoubleSide,
+      }
+    }),
+    MeshStandardMaterial: (textures) => ({
+      showLight: true,
+      material: {
+        metalness: 1,
+        roughness: 0,
+        // map: prepareTexture(textures.doorColor, {
+        //   colorSpace: THREE.SRGBColorSpace
+        // }),
+        // aoMap: textures.doorAmbientOcclusion,
+        // displacementMap: textures.doorHeight,
+        // metalnessMap: textures.doorMetalness,
+        // roughnessMap: textures.doorRoughness,
+        // normalMap: textures.doorNormal,
+        // alphaMap: textures.doorAlpha,
+        // aoMapIntensity: 1,
+        // displacementScale: 0.1,
+        // normalScale: new THREE.Vector2(0.5, 0.5),
+        transparent: true,
+        side: THREE.DoubleSide,
+      }
+    }),
+    MeshPhysicalMaterial: (textures) => ({
+      showLight: true,
+      material: {
+        metalness: 0,
+        roughness: 0,
+        sheen: 0,
+        sheenRoughness: 0,
+        sheenColor: '#ffffff',
+        clearcoat: 0,
+        clearcoatRoughness: 0,
+        transmission: 1,
+        ior: 1.5,
+        thickness: 0.5,
+        // map: prepareTexture(textures.doorColor, {
+        //   colorSpace: THREE.SRGBColorSpace
+        // }),
+        // aoMap: textures.doorAmbientOcclusion,
+        // displacementMap: textures.doorHeight,
+        // metalnessMap: textures.doorMetalness,
+        // roughnessMap: textures.doorRoughness,
+        // normalMap: textures.doorNormal,
+        // alphaMap: textures.doorAlpha,
+        // aoMapIntensity: 1,
+        // displacementScale: 0.1,
+        // normalScale: new THREE.Vector2(0.5, 0.5),
+        transparent: true,
+        side: THREE.DoubleSide,
+      }
     }),
     MeshNormalMaterial: () => ({
-      flatShading: true,
-      side: THREE.DoubleSide,
+      showLight: false,
+      material: {
+        transparent: true,
+        flatShading: false,
+        side: THREE.DoubleSide,
+      }
     }),
     MeshMatcapMaterial: (texture) => ({
-      matcap: prepareTexture(texture, {
-        colorSpace: THREE.SRGBColorSpace
-      }),
-      side: THREE.DoubleSide,
+      showLight: false,
+      material: {
+        transparent: true,
+        flatShading: false,
+        matcap: prepareTexture(texture, {
+          colorSpace: THREE.SRGBColorSpace
+        }),
+        side: THREE.DoubleSide,
+      }
     }),
-    MeshDepthMaterial:() => ({}),
-    MeshLambertMaterial:() => ({}),
+    MeshDepthMaterial:() => ({showLight: false, material: {}}),
+    MeshLambertMaterial:() => ({showLight: true, material: {}}),
     MeshPhongMaterial:() => ({
-      shininess: 100,
-      specular: '#1188ff',
-      side: THREE.DoubleSide,
+      showLight: true,
+      material: {
+        transparent: true,
+        flatShading: false,
+        shininess: 100,
+        specular: '#1188ff',
+        side: THREE.DoubleSide,
+      }
     }),
-    MeshToonMaterial: (texture) => ({
-      color: '#ffffff',
-      fog: true,
-      gradientMap: prepareTexture(texture.gradient, {
-        minFilter: THREE.NearestFilter,
-        magFilter: THREE.NearestFilter,
-        generateMipmaps: false,
-      }),
-      side: THREE.DoubleSide,
+    MeshToonMaterial: (textures) => ({
+      showLight: true,
+      material: {
+        color: '#ffffff',
+        fog: true,
+        gradientMap: prepareTexture(textures.gradient, {
+          minFilter: THREE.NearestFilter,
+          magFilter: THREE.NearestFilter,
+          generateMipmaps: false,
+        }),
+        side: THREE.DoubleSide,
+      }
     })
   }
   
@@ -71,7 +143,15 @@ const configureMaterials = () => {
     }
     
     const config = materialsConfig[type](texture)
-    return new Material({ ...config, ...overrides })
+    if ( !config.hasOwnProperty('showLight') || !config.hasOwnProperty('material') ) {
+      console.error(`Material config for ${type} is invalid`)
+      return null
+    }
+    
+    return {
+      showLight: config.showLight,
+      material: new Material({ ...config.material, ...overrides })
+    }
   }
   
   const prepareTexture = (texture, config={}) => {
@@ -85,6 +165,24 @@ const configureMaterials = () => {
   const textureLoader = new THREE.TextureLoader()
   const loadedTextures = loadTextures(textureLoader)
   const materialObjects = {
+    MeshStandardMaterial: createMaterial('MeshStandardMaterial', {
+      doorColor: loadedTextures.doorColor,
+      doorAmbientOcclusion: loadedTextures.doorAmbientOcclusion,
+      doorHeight: loadedTextures.doorHeight,
+      doorMetalness: loadedTextures.doorMetalness,
+      doorNormal: loadedTextures.doorNormal,
+      doorRoughness: loadedTextures.doorRoughness,
+      doorAlpha: loadedTextures.doorAlpha,
+    }),
+    MeshPhysicalMaterial: createMaterial('MeshPhysicalMaterial', {
+      doorColor: loadedTextures.doorColor,
+      doorAmbientOcclusion: loadedTextures.doorAmbientOcclusion,
+      doorHeight: loadedTextures.doorHeight,
+      doorMetalness: loadedTextures.doorMetalness,
+      doorNormal: loadedTextures.doorNormal,
+      doorRoughness: loadedTextures.doorRoughness,
+      doorAlpha: loadedTextures.doorAlpha,
+    }),
     MeshBasicMaterial: createMaterial(
       'MeshBasicMaterial',
       {doorColor: loadedTextures.doorColor, doorAlpha: loadedTextures.doorAlpha},
@@ -97,9 +195,10 @@ const configureMaterials = () => {
     MeshToonMaterial: createMaterial(
       'MeshToonMaterial',
       {gradient: loadedTextures.gradient},
-      { color: '#ff0000' }
+      { color: '#ffffff' }
     )
   }
+
   const materialTypes = Object.keys(materialObjects)
 
   return {

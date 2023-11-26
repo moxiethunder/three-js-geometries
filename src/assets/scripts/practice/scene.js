@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 import configureMaterials from '@scripts/practice/material-config.js'
 import createDebugGUI from '@scripts/practice/gui.js'
 import EventBus from '@scripts/services/EventBus'
@@ -39,7 +40,7 @@ const Scene = () => {
       'map', 'alphaMap', 'aoMap', 'bumpMap', 'displacementMap', 'emissiveMap', 'envMap', 'lightMap', 'metalnessMap', 'normalMap', 'roughnessMap', 'specularMap', 'gradientMap', 'clearcoatMap', 'clearcoatRoughnessMap', 'clearcoatNormalMap', 'transmissionMap', 'sheenMap', 'thicknessMap', 'emissiveMap',
     ]
     const meshes = [plane, sphere, torus]
-    const newMaterial = materials[material]
+    const newMaterial = materials[material].material
     
     meshes.forEach(mesh => {
       if ( mesh.material ) {
@@ -54,6 +55,10 @@ const Scene = () => {
     })
 
     renderer.render(scene, camera)
+  }
+
+  const getMaterial = (type) => {
+    return materials[type].material
   }
 
   //SCENE CONFIGURATION
@@ -77,18 +82,32 @@ const Scene = () => {
   const pointLight = new THREE.PointLight(0xffffff, 30)
   pointLight.position.set(2, 3, 4)
 
+  //ENVIRONMENT CONFIGURATION
+  const rgbLoader = new RGBELoader()
+  rgbLoader.load('/textures/environmentMap/2k.hdr', (environmentMap) => {
+    environmentMap.mapping = THREE.EquirectangularReflectionMapping
+    scene.background = environmentMap
+    scene.environment = environmentMap
+  })
+
   //TEXTURES & MATERIALS CONFIGURATION
   const { loader, textures, materials, types } = configureMaterials()
 
   //GUI CONFIGURATION
   const debugGUI = createDebugGUI({ 
-    title: 'Debug GUI'
-  }, materials.MeshBasicMaterial, {ambient: ambientLight, point: pointLight}, types)
+    title: 'Debug GUI',
+    width: 300,
+  },
+  'MeshPhysicalMaterial',
+  materials,
+  types,
+  {ambient: ambientLight, point: pointLight}
+  )
 
   //OBJECTS CONFIGURATION
-  const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), materials.MeshBasicMaterial)
-  const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), materials.MeshBasicMaterial)
-  const torus = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.2, 16, 32), materials.MeshBasicMaterial)
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 100, 100), getMaterial('MeshPhysicalMaterial'))
+  const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 64, 64), getMaterial('MeshPhysicalMaterial'))
+  const torus = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.2, 64, 128), getMaterial('MeshPhysicalMaterial'))
 
   //OBJECTS POSITIONING
   sphere.position.x = -1.5
