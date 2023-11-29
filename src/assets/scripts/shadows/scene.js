@@ -101,6 +101,20 @@ const Scene = () => {
   spotLightCamera.near = 1
   spotLightCamera.far = 10
 
+  const pointLightCamera = pointLight.shadow.camera
+  const pointLightShadow = pointLight.shadow
+
+  console.log(pointLightCamera)
+
+  const pointLightCameraHelper = new THREE.CameraHelper(pointLightCamera)
+  scene.add(pointLightCameraHelper)
+  pointLightCameraHelper.visible = false
+  
+  pointLightShadow.mapSize.width = 512 * 4
+  pointLightShadow.mapSize.height = 512 * 4
+  pointLightShadow.camera.near = 0.1
+  pointLightShadow.camera.far = 100
+
   //HIDE HELPERS
   spotLightHelper.visible = false
   directionalLightHelper.visible = false
@@ -126,6 +140,8 @@ const Scene = () => {
     dirLightCameraHelper,
     spotLightCamera,
     spotLightCameraHelper,
+    pointLightCamera,
+    pointLightCameraHelper,
   })
 
   //RENDERER CONFIGURATION
@@ -140,13 +156,22 @@ const Scene = () => {
   controls.enableDamping = true
   controls.dampingFactor = 0.05
 
+  const panDistance = -2
+  const lookDirection = new THREE.Vector3(0, 1, 0)
+  const panOffset = lookDirection.clone().multiplyScalar(panDistance)
+  // camera.getWorldDirection(lookDirection)
+  // const panOffset = new THREE.Vector3().crossVectors(camera.up, lookDirection).normalize().multiplyScalar(panDistance)
+  controls.target.add(panOffset)
+  // camera.lookAt(controls.target)
+  controls.update()
+
   //ANIMATION CONTROLS
   animateControls()
   // renderer.render(scene, camera)
 
   //EVENT LISTENERS
   window.addEventListener('resize', onWindowResize)
-  window.addEventListener('wheel', customZoom)
+  window.addEventListener('wheel', customZoom) 
 }
 
 export default Scene

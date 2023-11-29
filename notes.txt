@@ -1,0 +1,7 @@
+1: header | ugly scrollbars
+  - in form
+  - form-contact.scss
+2: footer | moxie logo interaction
+3: footer | fade in animations
+4: footer | spacing on contact
+3: articles | bug: overlap

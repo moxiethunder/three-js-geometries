@@ -2,7 +2,7 @@ import GUI from 'lil-gui'
 import * as THREE from 'three'
 
 export const createGUI = (config) => {
-  const { material, ambientLight, pointLight, spotLight, directionalLight, ico, torusKnot, plane, pointLightHelper, spotLightHelper, directionalLightHelper, dirTarget, spotTarget, dirLightCamera, dirLightCameraHelper, spotLightCamera, spotLightCameraHelper } = config
+  const { material, ambientLight, pointLight, spotLight, directionalLight, ico, torusKnot, plane, pointLightHelper, spotLightHelper, directionalLightHelper, dirTarget, spotTarget, dirLightCamera, dirLightCameraHelper, spotLightCamera, spotLightCameraHelper, pointLightCamera, pointLightCameraHelper } = config
 
   const headings = {
     dirTarget: 'Directional Light Target',
@@ -48,12 +48,23 @@ export const createGUI = (config) => {
   //POINT LIGHT
   const pointLightFolder = gui.addFolder('Point Light').close()
   pointLightFolder.add(pointLight, 'visible')
-  pointLightFolder.add(pointLightHelper, 'visible').name('show helper')
+  pointLightFolder.add(pointLightHelper, 'visible').name('show light helper')
+  pointLightFolder.add(pointLightCameraHelper, 'visible').name('show camera helper')
   pointLightFolder.addColor(pointLight, 'color').name('point color')
   pointLightFolder.add(pointLight, 'intensity').min(0).max(30).step(0.001).name('point intensity')
   pointLightFolder.add(pointLight.position, 'x').min(-10).max(10).step(0.001).name('position x')
   pointLightFolder.add(pointLight.position, 'y').min(-10).max(10).step(0.001).name('position y')
   pointLightFolder.add(pointLight.position, 'z').min(-10).max(10).step(0.001).name('position z')
+
+  const pointCameraFolder = pointLightFolder.addFolder('Point Light Camera').open()
+  pointCameraFolder.add(pointLightCamera, 'near').min(0).max(20).step(0.001).name('near').onChange(() => {
+    pointLightCamera.updateProjectionMatrix()
+    pointLightCameraHelper.update()
+  })
+  pointCameraFolder.add(pointLightCamera, 'far').min(0).max(20).step(0.001).name('far').onChange(() => {
+    pointLightCamera.updateProjectionMatrix()
+    pointLightCameraHelper.update()
+  })
 
   //SPOT LIGHT
   const spotLightFolder = gui.addFolder('Spot Light').close()
@@ -119,7 +130,7 @@ export const createLights = () => {
 
   // POINT LIGHT
   const pointLight = new THREE.PointLight(0xff0000, 8.25, 100)
-  pointLight.position.set(-0.95, 0.65, 1.4)
+  pointLight.position.set(-1.1, -0.4, 1.4)
   const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.1)
   pointLight.castShadow = true
 
