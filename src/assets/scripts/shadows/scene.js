@@ -156,14 +156,32 @@ const Scene = () => {
   controls.enableDamping = true
   controls.dampingFactor = 0.05
 
-  const panDistance = -2
-  const lookDirection = new THREE.Vector3(0, 1, 0)
-  const panOffset = lookDirection.clone().multiplyScalar(panDistance)
-  // camera.getWorldDirection(lookDirection)
-  // const panOffset = new THREE.Vector3().crossVectors(camera.up, lookDirection).normalize().multiplyScalar(panDistance)
-  controls.target.add(panOffset)
-  // camera.lookAt(controls.target)
-  controls.update()
+  // Distance you want to pan vertically (up and down)
+  const panYDistance = -2; // Use a negative value to pan up, positive to pan down
+
+  // Distance you want to pan horizontally (left and right)
+  const panXDistance = 0.25; // Use a negative value to pan left, positive to pan right
+
+  // Create a new vector pointing up (0, 1, 0) is the default up direction in Three.js
+  const panY = new THREE.Vector3(0, 1, 0);
+  const panYOffset = panY.clone().multiplyScalar(panYDistance);
+
+  // For panning left and right, we need a vector that is perpendicular to
+  // both the camera's up vector and the direction the camera is looking at
+  const lookDirection = new THREE.Vector3();
+  camera.getWorldDirection(lookDirection);
+  const panX = new THREE.Vector3().crossVectors(camera.up, lookDirection).normalize();
+  const panXOffset = panX.clone().multiplyScalar(panXDistance);
+
+  // Combine the vertical and horizontal pan offsets
+  const totalPanOffset = panYOffset.add(panXOffset);
+
+  // Add the total pan offset to the controls target
+  controls.target.add(totalPanOffset);
+
+  // Update the controls to ensure the camera looks at the new target
+  controls.update();
+
 
   //ANIMATION CONTROLS
   animateControls()
