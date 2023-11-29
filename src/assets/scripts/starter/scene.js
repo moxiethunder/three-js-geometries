@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 
 const Scene = () => {
   //FUNCTIONS
@@ -53,10 +52,6 @@ const Scene = () => {
 
   //TEXTURE LOADER
   const textureLoader = new THREE.TextureLoader()
-
-  //FONT LOADER
-  const fontLoader = new FontLoader()
-  fontLoader.load({})
 
   //OBJECTS CONFIGURATION
   const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({ color: 0x00ff00 }))

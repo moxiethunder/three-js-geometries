@@ -1,4 +1,4 @@
 import '@styles/main.scss'
-import Scene from '@scripts/typeface/scene'
+import Scene from '@scripts/shadows/scene'
 
-Scene()
+const scene = Scene()
